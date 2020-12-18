@@ -19,7 +19,7 @@ If anything goes wrong, you can rerun the command to resume upload from where it
 # jq
 sudo apt install jq -y
 
-curl -sSLo ~/tusc https://github.com/adhocore/tusc.sh/releases/latest/download/tusc
+curl -sSLo ~/tusc https://github.com/rexissimus/tusc.sh/archive/no-head.zip
 # for global binary
 chmod +x ~/tusc && sudo ln -s ~/tusc /usr/local/bin/tusc
 # OR, for user binary
@@ -36,7 +36,7 @@ chmod +x ~/tusc && mv ~/tusc ~/.local/bin/tusc
 - `readlink`, `realpath`
 - `sha1sum`, `sha256sum`, `seq`, `sleep`
 
-> Donot worry, in a typical UNIX flavored system these are likely to be there already.
+> Dont worry, in a typical UNIX flavored system these are likely to be there already.
 
 
 ## Usage and Examples
