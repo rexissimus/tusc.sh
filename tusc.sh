@@ -8,7 +8,7 @@
 # Be sure to check readme doc at https://github.com/adhocore/tusc.sh
 #
 
-if [[ -f ~/.tus.dbg ]]; then set -ex; else set -e; fi
+if [[ -f $HOME/.tus.dbg ]]; then set -ex; else set -e; fi
 
 FULL=$(readlink -f $0) TUSC=$(basename $0) SPINID=0 CURLARGS=
 
@@ -26,7 +26,7 @@ info() { line "$1" 33 0 $2; }
 comment() { line "$1" 30 1 $2; }
 
 # show version
-version() { echo v0.8.0; }
+version() { echo v0.8.1; }
 
 # update tusc
 update()
@@ -80,7 +80,7 @@ USAGE
 # get/set tus config
 tus-config() # $1 = key, $2 = value
 {
-  TUSFILE=`realpath ~/.tus.json`
+  TUSFILE="$HOME/.tus.json"
   [[ -f $TUSFILE ]] || echo '{}' > $TUSFILE
   TUSJSON=`cat $TUSFILE`
 
@@ -156,7 +156,7 @@ on-exit()
   [[ $OFFSET ]] || return 0
 
   OFFSET=${HEADERS[Upload-Offset]:-0}  LEFTOVER=$((SIZE - OFFSET))
-  if [[ $LEFTOVER -eq 0 ]]; then
+  if [[ $ISOK -eq 0 || $LEFTOVER -eq 0 ]]; then
     ok "✔ Uploaded successfully!"
   else
     error "✖ Unfinished upload, please rerun the command to resume." 1
@@ -232,6 +232,7 @@ else
 
   TUSURL=${HEADERS[Location]}
   [[ $TUSURL ]] || error "Tus server replied with empty location. Try changing --base-path param." 1
+  [[ $TUSURL != *"://"* ]] && TUSURL=$HOST$TUSURL
 
   # save location config
   tus-config ".[\"$KEY\"].location" "$TUSURL"
@@ -250,7 +251,7 @@ request "-H 'Content-Type: application/offset+octet-stream' \
 spinner
 HEADER0=$HEADER HEADER=`mktemp -t tus.XXXXXXXXXX`
 while :; do
-  [[ ${HEADERS[Upload-Offset]} -eq $SIZE ]] && exit
+  [[ (${HEADERS[Upload-Offset]} -eq $SIZE) || $ISOK -eq 0 ]] && exit
   request "--head $TUSURL" > /dev/null
   [[ ${HEADERS[Upload-Offset]} -eq $SIZE ]] || sleep 2
 done
